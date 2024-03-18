@@ -6,8 +6,8 @@
 #include <conio.h> 
 using namespace std;
 
-const int ROWS = 20;
-const int COLUMNS = 30;
+const int ROWS = 10;
+const int COLUMNS = 20;
 const int MAX_HEALTH = 100;
 
 class Character {
@@ -31,7 +31,7 @@ public:
     Adventurer(int r, int c, int h) : Character(r, c, h) {}
 
     void move() {
-        char movement = _getch(); // Get the key pressed without waiting for Enter
+        char movement = _getch(); 
 
         switch (movement) {
             case 72: // Up arrow key
@@ -99,16 +99,54 @@ public:
     }
 };
 
-void display_land(const Adventurer& adv, const NPC& npc) {
-    system("cls"); // Clear the console in a Windows environment
+class LandEnemy : public Character {
+public:
+    LandEnemy(int r, int c, int h) : Character(r, c, h) {}
 
+    void move() {
+        int direction = rand() % 4;
+
+        switch (direction) {
+            case 0: // Move up
+                if (row - 1 >= 0) {
+                    row--;
+                }
+                break;
+            case 1: // Move down
+                if (row + 1 < ROWS) {
+                    row++;
+                }
+                break;
+            case 2: // Move left
+                if (column - 1 >= 0) {
+                    column--;
+                }
+                break;
+            case 3: // Move right
+                if (column + 1 < COLUMNS) {
+                    column++;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+};
+
+void display_land(const Adventurer& adv, const NPC& npc, const LandEnemy& L1, const LandEnemy& L2) {
+    system("cls"); 
+    
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLUMNS; j++) {
             if (i == adv.getRow() && j == adv.getColumn()) {
                 cout << 'A';
-            } else if (i == npc.getRow() && j == npc.getColumn()) {
+            }else if (i == npc.getRow() && j == npc.getColumn()) {
                 cout << 'N';
-            } else {
+            }else if (i == L1.getRow() && j == L1.getColumn()) {
+                cout << 'L';
+            }else if (i == L2.getRow() && j == L2.getColumn()) {
+                cout << 'l';
+            }else {
                 cout << '_';
             }
         }
@@ -116,28 +154,24 @@ void display_land(const Adventurer& adv, const NPC& npc) {
     }
 }
 
-/*void land_effect(Character& character) {
-    int effect = rand() % 3; // 0: No effect, 1: Reduce health, 2: Increase health
-
-    switch (effect) {
-        case 1: // Reduce health by 30%
-            character.health -= MAX_HEALTH * 0.3;
-            if (character.health < 0) {
-                character.health = 0;
-            }
-            cout << "Health reduced by 30%!" << endl;
-            break;
-        case 2: // Increase health by 20%
-            character.health += MAX_HEALTH * 0.2;
-            if (character.health > MAX_HEALTH) {
-                character.health = MAX_HEALTH;
-            }
-            cout << "Health increased by 20%!" << endl;
-            break;
-        default:
-            break;
+int land_effect(Adventurer& adventurer, LandEnemy& L1, LandEnemy& L2) {
+    int Lose = 0;
+    if (adventurer.getRow() == L1.getRow() && adventurer.getColumn() == L1.getColumn()) {
+        adventurer.health -= MAX_HEALTH * 0.3;
+        if (adventurer.health < 0) {
+            cout << "Lose!" << endl;
+            Lose = 1;
+        }
     }
-}*/
+    if (adventurer.getRow() == L2.getRow() && adventurer.getColumn() == L2.getColumn()) {
+        adventurer.health -= MAX_HEALTH * 0.3;
+        if (adventurer.health < 0) {
+            cout << "Lose!" << endl;
+            Lose = 1;
+        }
+    }
+    return Lose;
+}
 
 int main() {
     srand(time(0)); // Seed the random number generator
@@ -154,16 +188,22 @@ int main() {
             case 1: {
                 Adventurer adventurer(1, 1, MAX_HEALTH);
                 NPC npc(8, 18, MAX_HEALTH);
-
-                while (true) {
-                    display_land(adventurer, npc);
-                    //cout<<"Adventurer Health is : "<<adventurer.health<<endl;
+                LandEnemy L1(5,5, MAX_HEALTH);
+                LandEnemy L2(9 ,10 , MAX_HEALTH);
+                int Lose;
+                while (Lose != 1) {
+                    display_land(adventurer, npc, L1, L2);
+                    cout<<"Adventurer Health is : "<<adventurer.health<<endl;
                     //cout<<"NPC Health is : "<<npc.health<<endl;
 
                     adventurer.move();
                     npc.move();
+                    L1.move();
+                    L2.move();
 
-                    //land_effect(adventurer);
+                    
+                    Lose = land_effect(adventurer, L1, L2);
+                    
                     //land_effect(npc);
 
                     if (adventurer.getRow() == npc.getRow() && adventurer.getColumn() == npc.getColumn()) {
