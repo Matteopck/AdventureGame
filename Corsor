@@ -1,0 +1,25 @@
+#include <iostream>
+#include <windows.h>
+
+using namespace std;
+
+void set_cursor(int,int);
+
+int main()
+{
+     int x=0 , y=0;
+     set_cursor(x,y);
+     cout<<"Mohammad Usman Sajid";
+
+     return 0;
+}
+
+void set_cursor(int x = 0 , int y = 0)
+{
+    HANDLE handle;
+    COORD coordinates;
+    handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    coordinates.X = x;
+    coordinates.Y = y;
+    SetConsoleCursorPosition ( handle , coordinates );
+}
