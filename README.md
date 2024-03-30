@@ -1,6 +1,6 @@
 README
 
--- Description
+-- Description :
 This code is a simple text-based adventure game implemented in C++. The game features an adventurer character that the player can control using the arrow keys and the space bar.
 The game world consists of a grid of cells, where the adventurer can move around and encounter non-player characters (NPCs) and land enemies.
 The game's objective is for the adventurer to reach the NPC while avoiding the land enemies. If the adventurer collides with a land enemy, their health decreases by 30%.
